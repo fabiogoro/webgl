@@ -1,0 +1,41 @@
+body {
+  padding-top: 10px;
+}
+.main-section {
+  padding: 40px 15px;
+  text-align: center;
+  z-index: 1;
+}
+#gl-canvas {
+  margin: 0;
+  padding: 0;
+  background-color: black;
+  width: 33.20%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 33.40%;
+  z-index: -1;
+}
+#gl-canvas-form {
+  margin: 0;
+  padding: 0;
+  background-color: black;
+  width: 33.33%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: -1;
+}
+#gl-canvas-surface {
+  margin: 0;
+  padding: 0;
+  background-color: black;
+  width: 33.33%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1;
+}

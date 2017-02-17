@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Computer Graphics">
+    <meta name="author" content="Fábio Goródscy">
+
+    <title>Fábio Goródscy - Segundo EP</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
+                           integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7"
+                           crossorigin="anonymous">
+    <script
+                           src="https://code.jquery.com/jquery-2.2.2.min.js"
+                           integrity="sha256-36cp2Co+/62rEAAYHLmRCPIych47CvdM+uTBJwSzWjI="
+                           crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+
+    <link href="assets/application.css" rel="stylesheet">
+    <script src="assets/application.js" type="text/javascript"></script>
+    <script type="text/javascript" src="./assets/webgl-utils.js"></script>
+    <script type="text/javascript" src="./assets/initshaders.js"></script>
+    <script type="text/javascript" src="./assets/MV.js"></script>
+    <script type="text/javascript" src="./assets/webgl.js"></script>
+
+    <script id="vertex-shader" type="x-shader/x-vertex">
+    attribute vec4 vPosition;
+    attribute vec4 vNormal;
+    varying vec3 N, L, E;
+    uniform mat4 modelViewMatrix;
+    uniform mat4 projectionMatrix;
+    uniform vec4 lightPosition;
+    uniform mat3 normalMatrix;
+    uniform vec4 r;
+    
+    attribute  vec2 vTexCoord;
+    varying vec2 fTexCoord;
+
+    vec4 multq(vec4 a, vec4 b)
+    {
+       return(vec4(a.x*b.x - dot(a.yzw, b.yzw), a.x*b.yzw+b.x*a.yzw+cross(b.yzw, a.yzw)));
+    }
+
+    vec4 invq(vec4 a)
+    {
+       return(vec4(a.x, -a.yzw)/dot(a,a));
+    } 
+
+    void main()
+    {
+      vec4 p;
+      vec3 light;
+      vec3 pos = (modelViewMatrix * vPosition).xyz;
+      if(lightPosition.z == 0.0)  L = normalize(lightPosition.xyz);
+      else  L = normalize(lightPosition).xyz - pos;
+
+      E =  -normalize(pos);
+      N = normalize( normalMatrix*vNormal.xyz);
+
+      p = vec4(0.0, (modelViewMatrix * vPosition).xyz);
+      p = multq(r, multq(p, invq(r))); 
+
+      fTexCoord = vTexCoord;
+      gl_Position = projectionMatrix * vec4(p.yzw,1.0); 
+    }
+    </script>
+
+    <script id="fragment-shader" type="x-shader/x-fragment">
+    precision mediump float;
+
+    uniform vec4 ambientProduct;
+    uniform vec4 diffuseProduct;
+    uniform vec4 specularProduct;
+    uniform float shininess;
+    varying vec3 N, L, E;
+
+    varying  vec2 fTexCoord;
+
+    uniform sampler2D texture;
+
+    void main()
+    {
+      vec4 fColor;
+
+      vec3 H = normalize( L + E );
+      vec4 ambient = ambientProduct;
+
+      float Kd = max( dot(L, N), 0.0 );
+      vec4  diffuse = Kd*diffuseProduct;
+
+      float Ks = pow( max(dot(N, H), 0.0), shininess );
+      vec4  specular = Ks * specularProduct;
+
+      if( dot(L, N) < 0.0 ) specular = vec4(0.0, 0.0, 0.0, 1.0);
+
+      fColor = ambient + diffuse +specular;
+      fColor.a = 1.0;
+
+      gl_FragColor = fColor * texture2D( texture, fTexCoord );
+    }
+    </script>
+  </head>
+
+  <body>
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="#">Fábio | 5932664 | Segundo EP</a>
+        </div>
+      </div>
+    </nav>
+    <div class="container">
+      <div class="main-section">
+        <p>
+          <div class="btn-group">
+            <button id="play" type="button" class="btn btn-sm btn-default" onclick="pause(this);"><i class="fa fa-pause"></i></button>
+            <button type="button" class="btn btn-sm btn-default" onclick="restart();"><i class="fa fa-refresh"></i></button>
+          </div>
+          <div class="btn-group">
+            <button type="button" class="btn btn-sm btn-default" onclick="remove_fly();"><i class="fa fa-minus"></i></button>
+            <button type="button" class="btn btn-sm btn-default">Mosquitos</button>
+            <button type="button" class="btn btn-sm btn-default" onclick="add_fly();"><i class="fa fa-plus"></i></button>
+          </div>
+          <div class="btn-group">
+            <button type="button" class="btn btn-sm btn-default" onclick="ortho_view();">Ortogonal</button>
+            <button type="button" class="btn btn-sm btn-default" onclick="perspective_view();">Perspectiva</button>
+          </div>
+          <div class="btn-group controls">
+            <button type="button" class="btn btn-sm btn-default" onclick="clock();">Horário</button>
+            <button type="button" class="btn btn-sm btn-default" onclick="counterclock();">Anti-Horário</button>
+          </div>
+        </p>
+
+        <canvas id="gl-canvas">
+          Parece que seu browser não suporta o elemento HTML5 <code>&lt;canvas&gt;</code>.
+        </canvas>
+        <img id = "texImage" src="images/fea.jpg" hidden></img>
+        <img id = "texImage1" src="images/cir1.gif" hidden></img>
+        <img id = "texImage2" src="images/gra.jpg" hidden></img>
+        <img id = "texImage3" src="images/sky.jpg" hidden></img>
+      </div>
+    </div>
+  </body>
+</html>
