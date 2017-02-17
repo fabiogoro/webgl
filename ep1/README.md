@@ -1,10 +1,3 @@
-**
-  Fábio Goródscy | NUSP: 9532664  
-  Introdução a Computação Gráfica  
-  DCC - IME - USP  
-  Primeiro Semestre de 2016
-**  
-
 # Primeiro EP: Guia do usuário
 
 
